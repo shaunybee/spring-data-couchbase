@@ -9,7 +9,10 @@ There are three backing mechanisms in Couchbase for repositories, described in t
  - <<couchbase.repository.views.querying>>
  - <<couchbase.repository.spatial>>
 
-Note that you can tune the consistency you want for your queries (see <<couchbase.repository.consistency>>).
+CRUD operations are still mostly backed by Couchbase views (see <<couchbase.repository.views>>).
+Such views (and, for N1QL, equivalent indexes) can be automatically built, but note this is an **expensive operation** (see <<couchbase.repository.indexing>>).
+
+Note that you can tune the consistency you want for your queries (see <<couchbase.repository.consistency>>) and have different repositories backed by different buckets (see <<couchbase.repository.multibucket>>)
 
 [[couchbase.repository.configuration]]
 == Configuration
@@ -228,6 +231,17 @@ Note that the important part in this map function is to only include the documen
 
 Also make sure to publish your design documents into production so that they can be picked up by the library! Also, if you are curious why we use `emit(null, null)` in the view: the document id is always sent over to the client implicitly, so we can shave off a view bytes in our view by not duplicating the id. If you use `emit(meta.id, null)` it won't hurt much too.
 
+[[couchbase.repository.indexing]]
+== Automatic Index Management
+We've seen that the repositories default methods can be backed by two broad kind of features: views and N1QL (in the case of paging and sorting).
+In order for the CRUD operations to work, the adequate view must have been created beforehand, and this is usually left for the user to do because view creation (and index creation) is an expensive operation that can take quite some time if the quantity of documents is high.
+
+In the case where the index creation cost isn't considered too high, it can be triggered automatically instead. You just need to annotate the repositories you want managed with the relevant annotation(s):
+
+ - `@ViewIndexed` will create a view like the "all" view previously seen, to list all entities in the bucket.
+ - `@N1qlSecondaryIndexed` will create a N1QL index that does the same kind of filtering on entity type. You can ensure a PRIMARY INDEX is there as well with this annotation.
+ - `@N1qlPrimaryIndexed` can be used instead if you don't expect a large number of documents (low enough that a dedicated secondary index isn't needed) but just want to make sure a PRIMARY INDEX in N1QL is available.
+
 [[couchbase.repository.views.querying]]
 === View based querying
 
@@ -435,7 +449,6 @@ Provide the implementation and directly use `queryView` and `queryN1QL` methods 
  - one can specify the consistency on those via their respective query classes, according to the Couchbase Java SDK documentation.
  - for example for views `ViewQuery.stale(Stale.FALSE)`
  - for example for N1QL `Query.simple("SELECT * FROM default", QueryParams.build().consistency(ScanConsistency.REQUEST_PLUS));`
-
 
 [[couchbase.repository.multibucket]]
 == Working with multiple buckets

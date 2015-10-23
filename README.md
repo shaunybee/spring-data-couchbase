@@ -140,6 +140,9 @@ function (doc, meta) {
 }
 ```
 
+Alternatively, if view creation isn't too costly, you can ask the framework to create it automatically by annotating the
+repository with `@ViewIndexed(designDoc = "userInfo", viewName = "all")`.
+
 ## N1QL and Query Derivation
 With the introduction of `N1QL`, Couchbase can now better support query derivation (the mechanism that allows you to
 add custom methods that will automatically be implemented as a N1QL query derived from the method's name).

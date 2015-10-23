@@ -119,7 +119,7 @@ The reference to a CouchbaseConverter instance.
                     </xsd:documentation>
                     <xsd:appinfo>
                         <tool:annotation kind="direct">
-                            <tool:expected-type type="org.springframework.data.couchbase.core.view.Consistency"/>
+                            <tool:expected-type type="org.springframework.data.couchbase.core.query.Consistency"/>
                         </tool:annotation>
                     </xsd:appinfo>
                 </xsd:annotation>
