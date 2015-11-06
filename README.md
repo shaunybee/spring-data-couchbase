@@ -178,6 +178,10 @@ List<UserInfo> findPatrickAndJackAmongOthers();
 List<UserInfo> findUsersWithTheirFirstnameLike(String likePattern);
 ```
 
+N1QL needs at least a generic purpose `N1QL primary index` to work with, and can make use of a more entity
+type-specific `N1QL secondary index`. You can create both automatically (provided you are confident this
+is not to much of a cost) by annotating a repository with `@N1qlPrimaryIndexed` and/or `@N1qlSecondaryIndexed`. 
+
 ## Using The Repository
 
 Extending `CrudRepository` causes CRUD methods being pulled into the interface so that you can easily save and find

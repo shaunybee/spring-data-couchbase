@@ -239,8 +239,8 @@ In order for the CRUD operations to work, the adequate view must have been creat
 In the case where the index creation cost isn't considered too high, it can be triggered automatically instead. You just need to annotate the repositories you want managed with the relevant annotation(s):
 
  - `@ViewIndexed` will create a view like the "all" view previously seen, to list all entities in the bucket.
- - `@N1qlSecondaryIndexed` will create a N1QL index that does the same kind of filtering on entity type. You can ensure a PRIMARY INDEX is there as well with this annotation.
- - `@N1qlPrimaryIndexed` can be used instead if you don't expect a large number of documents (low enough that a dedicated secondary index isn't needed) but just want to make sure a PRIMARY INDEX in N1QL is available.
+ - `@N1qlPrimaryIndexed` can be used to ensure a general-purpose PRIMARY INDEX is available in N1QL.
+ - `@N1qlSecondaryIndexed` will create a more specific N1QL index that does the same kind of filtering on entity type that the view does. It'll allow for efficient listing of all documents that correspond to a Repository's associated domain object.
 
 [[couchbase.repository.views.querying]]
 === View based querying

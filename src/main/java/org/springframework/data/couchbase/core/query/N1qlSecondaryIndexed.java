@@ -29,6 +29,8 @@ import org.springframework.data.couchbase.repository.CouchbaseRepository;
  * <p/>
  * Said index will relate to the "type" field (the one bearing type information) and restrict on documents
  * that match the repository's entity class.
+ * <p/>
+ * Be sure to also use {@link N1qlPrimaryIndexed} to make sure the PRIMARY INDEX is there as well.
  *
  * @author Simon Baslé
  */
@@ -41,9 +43,4 @@ public @interface N1qlSecondaryIndexed {
    */
   String indexName();
 
-  /**
-   * Indicates if the framework should also ensure a N1QL Primary Index is present, even if
-   * {@link org.springframework.data.couchbase.core.query.N1qlPrimaryIndexed} is not used.
-   */
-  boolean ensurePrimaryIndex() default true;
 }
