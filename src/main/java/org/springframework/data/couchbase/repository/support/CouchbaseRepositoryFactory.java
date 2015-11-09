@@ -66,6 +66,11 @@ public class CouchbaseRepositoryFactory extends RepositoryFactorySupport {
   private final RepositoryOperationsMapping couchbaseOperationsMapping;
 
   /**
+   * Holds the reference to the {@link IndexManager}.
+   */
+  private final IndexManager indexManager;
+
+  /**
    * Holds the mapping context.
    */
   private final MappingContext<? extends CouchbasePersistentEntity<?>, CouchbasePersistentProperty> mappingContext;
@@ -80,10 +85,12 @@ public class CouchbaseRepositoryFactory extends RepositoryFactorySupport {
    *
    * @param couchbaseOperationsMapping the template for the underlying actions.
    */
-  public CouchbaseRepositoryFactory(final RepositoryOperationsMapping couchbaseOperationsMapping) {
+  public CouchbaseRepositoryFactory(final RepositoryOperationsMapping couchbaseOperationsMapping, final IndexManager indexManager) {
     Assert.notNull(couchbaseOperationsMapping);
+    Assert.notNull(indexManager);
 
     this.couchbaseOperationsMapping = couchbaseOperationsMapping;
+    this.indexManager = indexManager;
     mappingContext = this.couchbaseOperationsMapping.getDefault().getConverter().getMappingContext();
     viewPostProcessor = ViewPostProcessor.INSTANCE;
 
@@ -128,7 +135,7 @@ public class CouchbaseRepositoryFactory extends RepositoryFactorySupport {
 
     checkFeatures(metadata, isN1qlAvailable, n1qlPrimaryIndexed, n1qlSecondaryIndexed);
 
-    new IndexManager().buildIndexes(metadata, viewIndexed, n1qlPrimaryIndexed, n1qlSecondaryIndexed, couchbaseOperations);
+    indexManager.buildIndexes(metadata, viewIndexed, n1qlPrimaryIndexed, n1qlSecondaryIndexed, couchbaseOperations);
 
     CouchbaseEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainType());
     if (isN1qlAvailable) {

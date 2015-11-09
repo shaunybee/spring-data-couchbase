@@ -238,9 +238,11 @@ In order for the CRUD operations to work, the adequate view must have been creat
 
 In the case where the index creation cost isn't considered too high, it can be triggered automatically instead. You just need to annotate the repositories you want managed with the relevant annotation(s):
 
- - `@ViewIndexed` will create a view like the "all" view previously seen, to list all entities in the bucket.
+ - `@ViewIndexed` will create a view like the "all" view previously seen, to list all entities in the bucket. It can also be used on methods, allowing multiple views to be created with custom map function and reduce function.
  - `@N1qlPrimaryIndexed` can be used to ensure a general-purpose PRIMARY INDEX is available in N1QL.
  - `@N1qlSecondaryIndexed` will create a more specific N1QL index that does the same kind of filtering on entity type that the view does. It'll allow for efficient listing of all documents that correspond to a Repository's associated domain object.
+
+Note that sometimes you only want this automatic creation in certain contexts (eg. in Dev but not in Production). To that end, you can customize the `IndexManager` bean in an env-specific `AbstractCouchbaseConfiguration` (eg. via `@Profile`) to ignore certain types of index creation annotations. This is done through the `IndexManager(boolean ignoreView, boolean ignoreN1qlPrimary, boolean ignoreN1qlSecondary)` constructor. You can even declare multiple beans and differentiate them using Spring annotations.
 
 [[couchbase.repository.views.querying]]
 === View based querying

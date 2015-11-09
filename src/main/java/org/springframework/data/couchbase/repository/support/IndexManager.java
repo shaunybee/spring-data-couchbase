@@ -36,6 +36,7 @@ import rx.exceptions.CompositeException;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.couchbase.core.CouchbaseOperations;
 import org.springframework.data.couchbase.core.CouchbaseQueryExecutionException;
 import org.springframework.data.couchbase.core.query.N1qlPrimaryIndexed;
@@ -59,10 +60,62 @@ public class IndexManager {
 
   private static final JsonObject SUCCESS_MARKER = JsonObject.empty();
 
+  /** True if this index manager should ignore view creation annotations */
+  private boolean ignoreViews;
+  /** True if this index manager should ignore N1QL PRIMARY creation annotations */
+  private boolean ignoreN1qlPrimary;
+  /** True if this index manager should ignore N1QL SECONDARY creation annotations */
+  private boolean ignoreN1qlSecondary;
+
+
+  /**
+   * Construct an IndexManager that can be used as a Bean in a {@link Profile @Profile} annotated configuration
+   * in order to ignore all or part of automatic index creations in some contexts (like activating it in Dev but
+   * not in Prod).
+   *
+   * @param ignoreViews true to ignore {@link ViewIndexed} annotations.
+   * @param ignoreN1qlPrimary true to ignore {@link N1qlPrimaryIndexed} annotations.
+   * @param ignoreN1qlSecondary true to ignore {@link N1qlSecondaryIndexed} annotations.
+   */
+  public IndexManager(boolean ignoreViews, boolean ignoreN1qlPrimary, boolean ignoreN1qlSecondary) {
+    this.ignoreViews = ignoreViews;
+    this.ignoreN1qlPrimary = ignoreN1qlPrimary;
+    this.ignoreN1qlSecondary = ignoreN1qlSecondary;
+  }
+
+  /**
+   * Construct a default IndexManager that process all three types of automatic index creations.
+   */
+  public IndexManager() {
+    this(false, false, false);
+  }
+
+  /**
+   * @return true if this IndexManager ignores {@link ViewIndexed} annotations.
+   */
+  public boolean isIgnoreViews() {
+    return ignoreViews;
+  }
+
+  /**
+   * @return true if this IndexManager ignores {@link N1qlPrimaryIndexed} annotations.
+   */
+  public boolean isIgnoreN1qlPrimary() {
+    return ignoreN1qlPrimary;
+  }
+
+  /**
+   * @return true if this IndexManager ignores {@link N1qlSecondaryIndexed} annotations.
+   */
+  public boolean isIgnoreN1qlSecondary() {
+    return ignoreN1qlSecondary;
+  }
+
   /**
    * Build the relevant indexes according to the provided annotation and repository metadata, in parallel but blocking
    * until all relevant indexes are created. Existing indexes will be detected and skipped.
    * <p/>
+   * Note that this IndexManager could be configured to ignore some of the annotation types.
    * In case of multiple errors, a {@link CompositeException} can be raised with up to 3 causes (one per type of index).
    *
    * @param metadata the repository's metadata (allowing to find out the type of entity stored, the key under which type
@@ -80,15 +133,15 @@ public class IndexManager {
     Observable<Void> n1qlPrimaryAsync = Observable.empty();
     Observable<Void> n1qlSecondaryAsync = Observable.empty();
 
-    if (viewIndexed != null) {
+    if (viewIndexed != null && !ignoreViews) {
       viewAsync = buildAllView(viewIndexed, metadata, couchbaseOperations);
     }
 
-    if (n1qlPrimaryIndexed != null || (n1qlSecondaryIndexed != null && n1qlSecondaryIndexed.ensurePrimaryIndex())) {
+    if (n1qlPrimaryIndexed != null && !ignoreN1qlPrimary) {
       n1qlPrimaryAsync = buildN1qlPrimary(metadata, couchbaseOperations);
     }
 
-    if (n1qlSecondaryIndexed != null) {
+    if (n1qlSecondaryIndexed != null && !ignoreN1qlSecondary) {
       n1qlSecondaryAsync = buildN1qlSecondary(n1qlSecondaryIndexed, metadata, couchbaseOperations);
     }
 

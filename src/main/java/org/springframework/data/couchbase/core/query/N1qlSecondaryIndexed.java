@@ -34,7 +34,7 @@ import org.springframework.data.couchbase.repository.CouchbaseRepository;
  *
  * @author Simon Baslé
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface N1qlSecondaryIndexed {
 

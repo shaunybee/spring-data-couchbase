@@ -29,7 +29,8 @@ import java.lang.annotation.Target;
  * The view must at least be described as a design document name and view name. Default map function
  * will filter documents on the type associated to the repository, and default reduce function is "_count".
  * <p/>
- * One can specify a custom reduce function as well as a non-default map function.
+ * One can specify a custom reduce function as well as a non-default map function. This can be done on methods,
+ * allowing for multiple views per repository to be created.
  *
  * @author Simon Baslé
  */
