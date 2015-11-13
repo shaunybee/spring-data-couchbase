@@ -1,5 +1,10 @@
 # Spring Data Couchbase
 
+This fork is just for testing out the capabilities of circleci vs travis ci
+I wont change any code per se - just needed  a hello world with sufficient complexity in java to test with.
+
+
+---
 The primary goal of the [Spring Data](http://www.springsource.org/spring-data) project is to make it easier to build
 Spring-powered applications that use new data access technologies such as non-relational databases, map-reduce
 frameworks, and cloud based data services.
